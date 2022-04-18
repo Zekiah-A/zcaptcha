@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Captcha Test</title>
+</head>
+<body>
+  <script>
+  const socket = new WebSocket('ws://localhost:1234');
+
+  socket.addEventListener('open', function (event) {
+  }); //socket.send("")
+
+  socket.addEventListener('message', function (event) {
+    if (event.data.toString() == 'update') {
+      console.log("Recieved new captcha image.")
+      document.getElementById("captchaImage").src = "captcha.png?t=" + new Date().getTime() //Cache-image-preventing date
+    }
+    if (event.data.toString() == "true") {
+      alert("Correct answer!")
+    }
+    else if (event.data.toString() == "false") {
+      alert("Incorrect answer.")
+    }
+  });
+  
+  function requestCaptcha() {
+    socket.send("reqImage")
+  }
+  function submitAnswer() {
+    let ans = document.getElementById("enteredAnswer").value.trim().replace(" ", "")
+    socket.send("submit " + ans)
+  }
+  </script>
+  <button onclick="requestCaptcha()">Request Captcha</button><br>
+  <img id="captchaImage"></img> <br>
+  <input id="enteredAnswer"></input>
+  <button onclick="submitAnswer()">Submit</button>
+</body>
+</html>
